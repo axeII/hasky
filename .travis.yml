@@ -2,6 +2,6 @@ language: python
 python:
   - "3.6"
 # command to install dependencies
-#install: "pip install -r requirements.txt"
+install: true
 # command to run tests
-#script: pytest
+script: python main.py

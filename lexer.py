@@ -7,6 +7,7 @@ __author__ = 'ales lerch'
 import re
 from sys import stdin
 from enum import Enum
+from sys import exit
 
 class LexerState(Enum):
     Q_S = 0
@@ -24,7 +25,7 @@ class LexerState(Enum):
 
 class TokenType(Enum):
     identifier = 0
-    number = 1
+    integer = 1
     string = 2
     left_paren = 3
     right_paren = 4
@@ -41,7 +42,8 @@ class TokenType(Enum):
     assigment_op = 15
     dot = 16
     expr_sperator = 17
-    end_of_file = 18
+    real = 18
+    end_of_file = 19
 
 
 class Token:
@@ -57,8 +59,9 @@ class Token:
 
     def lexer(self, input_file = stdin):
         last_line_nuber = 0
-        id_number_free = re.compile("[a-zA-Z_-]+-")
-        id_complex = re.compile("[a-zA-Z0-9_+-]+")
+        id_number_free = re.compile("[a-zA-Z+-/*]+")
+        id_complex = re.compile("[a-zA-Z0-9_+-*/']+")
+        universal = re.compile("[,:>=\.\[\]]+")
         with open(input_file) as content:
             for line, line_number in zip(content, itertools.count()):
                 value = ""
@@ -116,13 +119,110 @@ class Token:
                         elif line[0] == '.':
                             line = line[1:]
                             yield Token(last_line_nuber,'.',TokenType.dot)
+                        else:
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
 
                     elif state == LexerState.A1:
                         if id_number_free.match(line[0]) or id_complex.match(line[0]):
                             value += line[0]
+                            line = lien[1:]
+                            state = LexerState.AF
                         else:
-                            pass
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
 
+                    elif state == LexerState.AF:
+                        if id_number_free.match(line[0]) or id_complex.match(line[0]):
+                            value += line[0]
+                            line = line[1:]
+                        else:
+                            yield Token(last_line_nuber,value,TokenType.identifier)
+                            value = ""
+                            state = LexerState.Q_S
+
+                    elif state == LexerState.B1:
+                        if line[0].isdigit():
+                            value += line[0]
+                            line = line[1:]
+                            state = LexerState.B1F
+                        elif line[0] in ('e','E','.'):
+                            value += line[0]
+                            line = line[1:]
+                            state = LexerState.B2
+                        else:
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
+
+                    elif state == LexerState.B1F:
+                        if line[0].isdigit():
+                            value += line[0]
+                            line = line[1:]
+                        elif line[0] in ('e','E','.'):
+                            value += line[0]
+                            line = line[1:]
+                            state = LexerState.B2
+                        else:
+                            yield Token(last_line_nuber,float(value),TokenType.integer)
+                            value = ""
+                            state = LexerState.Q_S
+
+                    elif state == LexerState.B2:
+                        if line[0].isdigit():
+                            value += line[0]
+                            line = line[1:]
+                            state = LexerState.B2F
+                        else:
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
+
+                    elif state == B2F:
+                        if line[0].isdigit():
+                            value += line[0]
+                            line = line[1:]
+                        else:
+                            yield Token(last_line_nuber,float(value),TokenType.real)
+                            value = ""
+                            state = LexerState.Q_S
+
+                    elif state == LexerState.C1:
+                        if line[0] in ('\t',' ') or universal.match(line[0]) or\
+                                id_complex.match(line[0]):
+                            value += line[0]#do i need to save commentary content?
+                            line = line[1:]
+                        elif line[0] == '\n':
+                            value = ""
+                            state = LexerState.Q_S
+                        else:
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
+
+                    elif state == LexerState.D1:
+                        if line[0] in ('\\','\t',' ') or universal.match(line[0]) or\
+                                id_complex.match(line[0]):
+                            value += line[0]
+                            line = line[1:]
+                            status = LexerState.D2
+                        elif line[0] == '"':
+                            yield Token(last_line_nuber,value,TokenType.string)
+                            value = ""
+                            state = LexerState.Q_S
+                        else:
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
+
+                    elif state == LexerState.D2:
+                        if line[0] in ('\\','"','\t',' ') or universal.match(line[0]) or\
+                                id_complex.match(line[0]):
+                            value += line[0]
+                            line = line[1:]
+                            state = LexerState.D1
+                        else:
+                            print(f"[Error][LA] found uknown character {line[0]}")
+                            exit(1)
+                if value != "":
+                    print("[Warning][LA] Some data has not been checked by LA:")
+                    print(value)
         yield Token(last_line_number, "EOF", TokenType.end_of_file)
 
 if __name__ == "__main__":

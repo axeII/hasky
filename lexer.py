@@ -1,6 +1,6 @@
-"""Desktop daemon
+"""Lexer
 
-This is desktop deamon for checking desktop files
+Lexical analyzator for discovering states
 """
 __author__ = 'ales lerch'
 

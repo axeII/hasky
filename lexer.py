@@ -49,7 +49,7 @@ class TokenType(Enum):
 
 class Token:
 
-    def __init__(self, line, value, token_type):
+    def __init__(self, line = 0, value = "", token_type = None):
         self.line = line
         self.value = value
         self.token_type = token_type
@@ -242,6 +242,6 @@ class Token:
         yield Token(last_line_number, "EOF", TokenType.end_of_file)
 
 if __name__ == "__main__":
-    t = Token(0,'',TokenType.space)
+    t = Token()
     for i in t.lexer():
         print(i)

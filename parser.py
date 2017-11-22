@@ -19,10 +19,10 @@ Let' -> { BL in Expr }
 """
 __author__ = 'ales lerch'
 
-from sys import exit
 from lexer import *
+from sys import exit, stderr, stdin, stdout
 
-class Parse:
+class Parser:
 
     def __init__(self, lexer):
         self.lexer = lexer
@@ -38,7 +38,7 @@ class Parse:
             return False
 
     def error(self, msg = ""):
-        print(msg, file = sys.stderr)
+        print(msg, file = stderr)
         exit(2)
 
     def atomic_blonde(self):
@@ -56,6 +56,8 @@ class Parse:
     def program(self):
         if self.is_identificatior():
             self.binding_list()
+        elif self.token.token_type == TokenType.end_of_file:
+            pass
         else:
             self.error(f"Expected identificator but {self.token} found")
 
@@ -78,7 +80,7 @@ class Parse:
             self.next_token()
             self.binding_list()
         else:
-            self.error(f"Expected identificator but {self.token} found")
+            self.error(f"Expected ;, new line, fn,end of file but {self.token} found")
 
     def single_binding(self):
         if self.is_identificatior():
@@ -95,7 +97,7 @@ class Parse:
                 or self.token.token_type == tokentype.left_paren:
             self.expression()
         else:
-            self.error(f"Expected identificator but {self.token} found")
+            self.error(f"Expected identificator, atom, (, = but {self.token} found")
 
     def expression(self):
         if self.is_identificatior or self.atomic_blonde()\
@@ -103,11 +105,17 @@ class Parse:
             self.value()
             self.expression_()
         else:
-            self.error(f"Expected identificator but {self.token} found")
+            self.error(f"Expected ( but {self.token} found")
 
     def expression_(self):
         if self.token.token_type == TokenType.end_of_file:
             self.token = None
         elif self.fn_keyword() or atomic_blonde() or is_identificatior():
             self.next_token()
+
+if __name__ == '__main__':
+    t = Token()
+    p = Parser(t.lexer())
+    print(p.program())
+
 

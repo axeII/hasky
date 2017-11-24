@@ -34,7 +34,7 @@ class TokenType(Enum):
     right_braces = 6 #}
     left_closed_braces = 7 #[
     right_closed_braces = 8 #]
-    line_feed = 9 #\n
+    separator = 9
     tab = 10
     space = 11
     comma = 12 #,
@@ -42,9 +42,8 @@ class TokenType(Enum):
     fn_conj = 14 # >
     assigment_op = 15 #=
     dot = 16 #.
-    semicolon = 17 #;
-    real = 18
-    end_of_file = 19
+    real = 17
+    end_of_file = 18
 
 
 class Token:
@@ -119,10 +118,10 @@ class Token:
                             yield Token(last_line_number,'=',TokenType.assigment_op)
                         elif line[0] == ';':
                             line = line[1:]
-                            yield Token(last_line_number,';',TokenType.semicolon)
+                            yield Token(last_line_number,';',TokenType.separator)
                         elif line[0] == '\n':
                             line = line[1:]
-                            yield Token(last_line_number,'\n',TokenType.line_feed)
+                            yield Token(last_line_number,'\n',TokenType.separator)
                         elif line[0] == ' ':
                             line = line[1:]
                             yield Token(last_line_number,' ',TokenType.space)

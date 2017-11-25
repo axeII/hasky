@@ -34,12 +34,13 @@ class Parser:
     def next_token(self):
         try:
             self.token = next(self.lexer)
+            print(self.token.token_type, self.token.value)
             return True
         except StopIteration:
             return False
 
-    def error(self, msg = ""):
-        print(msg, file = stderr)
+    def error(self, exp):
+        print(f"On line: {self.token.line} expected identificator but {self.token.value} found")
         exit(2)
 
     def atomic_blonde(self):
@@ -54,23 +55,26 @@ class Parser:
 
     #Program -> BL
     def program(self):
+        print("Program")
         if self.is_identificatior():
             self.binding_list()
         elif self.token.token_type == TokenType.end_of_file:
             pass
         else:
-            self.error(f"Expected identificator but {self.token} found")
+            self.error("identificator")
 
     #BL → SB BL'
     def binding_list(self):
+        print("binding_list")
         if self.is_identificatior():
             self.single_binding()
-            self.single_binding_()
+            self.binding_list_()
         else:
-            self.error(f"Expected identificator but {self.token} found")
+            self.error("identificator")
 
     #BL' -> epsilon | ; BL | '\n' BL
     def binding_list_(self):
+        print("binding_list_")
         if self.token.token_type == TokenType.end_of_file:
             self.token = None
         elif self.is_identificatior("in"):
@@ -78,16 +82,19 @@ class Parser:
         elif self.is_identificatior():
             self.binding_list()
         else:
-            self.error(f"Expected ;, new line, fn,end of file but {self.token} found")
+            self.error("identificator, newline, fn, eof")
 
     def single_binding(self):
+        print("single_binding")
         if self.is_identificatior():
             self.next_token()
             self.single_binding_()
         else:
             self.error(f"Expected identificator but {self.token} found")
+            self.error("identificator")
 
     def single_binding_(self):
+        print("single_binding_")
         if self.token.token_type == TokenType.assigment_op:
             self.next_token()
             self.expression()
@@ -98,9 +105,10 @@ class Parser:
                 or self.token.token_type == TokenType.left_closed_braces:
             self.expression()
         else:
-            self.error(f"Expected identificator, atom, (, = but {self.token} found")
+            self.error("identificator, atom, (, =")
 
     def expression(self):
+        print("expression")
         if self.is_identificatior()\
                 or self.is_identificatior("fn")\
                 or self.atomic_blonde()\
@@ -109,9 +117,10 @@ class Parser:
             self.value()
             self.expression_()
         else:
-            self.error(f"Expected ( but {self.token} found")
+            self.error("(")
 
     def expression_(self):
+        print("expression_")
         if self.token.token_type == TokenType.separator:
             self.next_token()
         elif self.is_identificatior()\
@@ -124,15 +133,15 @@ class Parser:
             self.next_token()
             self.expression()
         else:
-            self.error(f"Expected > or identifcator but {self.token} found")
+            self.error("identificator, >")
 
     def value(self):
+        print("value")
         if self.is_identificatior("fn"):
-            self.next_token()
             self._lambda()
         elif self.is_identificatior():
             self.next_token()
-        elif atomic_blonde():
+        elif self.atomic_blonde():
             self.next_token()
         elif self.token.token_type == TokenType.left_paren:
             self.next_token()
@@ -140,57 +149,63 @@ class Parser:
             if self.token == TokenType.right_paren:
                 self.next_token()
             else:
-                self.error(f"Expected ) but {self.token} found")
+                self.error(")")
         elif self.token.token_type == TokenType.left_closed_braces:
             self.next_token()
             self.expression()
             if self.token == TokenType.right_closed_braces:
                 self.next_token()
             else:
-                self.error(f"Expected ) but {self.token} found")
+                self.error(")")
         else:
-            self.error(f"Expected ) but {self.token} found")
+            self.error(")")
 
     def _lambda(self):
+        print("_lambda")
         if self.is_identificatior("fn"):
             self.next_token()
             self._lambda_()
         else:
-            self.error(f"Expected ) but {self.token} found")
+            self.error(")")
 
     def _lambda_(self):
+        print("_lambda_")
         if self.is_identificatior():
             self.idens()
             self.x()
         else:
-            self.error(f"Expected identifcator but {self.token} found")
+            self.error("identificator")
 
     def idens(self):
-        if is_identificatior():
+        print("idens")
+        if self.is_identificatior():
             self.next_token()
             self.idens_()
         else:
-            self.error(f"Expected identifcator but {self.token} found")
+            self.error("identificator")
 
     def idens_(self):
+        print("idens_")
         if self.token.token_type == TokenType.left_braces\
                 or self.token.token_type == TokenType.arg_sep:
             self.token = None
         elif self.is_identificatior():
             self.next_token()
         else:
-            self.error(f"Expected identifcator but {self.token} found")
+            self.error("identificator")
 
     def x(self):
+        print("x")
         if self.token.token_type == TokenType.arg_sep:
             self.next_token()
             self.expression()
         elif self.token.token_type == TokenType.left_braces:
             self.body()
         else:
-            self.error(f"Expected identifcator but {self.token} found")
+            self.error("identificator")
 
     def body(self):
+        print("body")
         if self.token.token_type == TokenType.left_braces:
             self.next_token()
             self.binding_list()
@@ -198,15 +213,13 @@ class Parser:
                 self.next_token()
                 self.expression()
             else:
-                self.error(f"Expected in but {self.token} found")
+                self.error("in")
             if self.token.token_type == TokenType.right_braces:
                 self.next_token()
             else:
-                self.error(f'{{ {"10"}')
-                self.error(f'Expected }} but {self.token} found')
+                self.error("}}")
         else:
-            self.error(f"Expected {{ but {self.token} found")
-
+            self.error("{{")
 
 if __name__ == '__main__':
     t = Token()

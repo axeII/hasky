@@ -23,7 +23,6 @@ class LexerState(Enum):
     Q_D2 = 9
     Q_F = 10
 
-
 class TokenType(Enum):
     identifier = 0
     integer = 1
@@ -45,17 +44,16 @@ class TokenType(Enum):
     real = 17
     end_of_file = 18
 
-
 class Token:
 
-    def __init__(self, line = 0, value = "", token_type = None):
+    def __init__(self, line = 1, value = "", token_type = None):
         self.line = line
         self.value = value
         self.token_type = token_type
         #think about splitting input text for parts
 
     def __repr__(self):
-        return f"[line: {self.line+1}, type: {self.token_type}] {self.value}"
+        return f"[line: {self.line}, type: {self.token_type}] {self.value}"
 
     def check_input(self, input_file):
         if input_file:
@@ -66,13 +64,13 @@ class Token:
             return stdin
 
     def lexer(self, input_file = ""):
-        last_line_number = 0
+        last_line_number = 1
         id_number_free = re.compile("[a-zA-Z+-\/\*]+")
         id_complex = re.compile("[a-zA-Z0-9_+-\/\*']+")
         universal = re.compile("[,:>=\.\[\]]+")
         input_file = self.check_input(input_file)
         with input_file as content:
-            for line, line_number in zip(content, itertools.count()):
+            for line, line_number in zip(content, itertools.count(1)):
                 value = ""
                 state = LexerState.Q_S
                 last_line_number = line_number
@@ -124,7 +122,6 @@ class Token:
                             yield Token(last_line_number,'\n',TokenType.separator)
                         elif line[0] == ' ':
                             line = line[1:]
-                            yield Token(last_line_number,' ',TokenType.space)
                         elif line[0] == '.':
                             line = line[1:]
                             yield Token(last_line_number,'.',TokenType.dot)

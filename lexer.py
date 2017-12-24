@@ -44,6 +44,17 @@ class TokenType(Enum):
     real = 17
     end_of_file = 18
 
+class Stream:
+    def __init__(self, data):
+        self.data = data
+
+    def __enter__(self):
+        #print(self.data)
+        return self.data
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        pass
+
 class Token:
 
     def __init__(self, line = 1, value = "", token_type = None):
@@ -55,20 +66,22 @@ class Token:
     def __repr__(self):
         return f"[line: {self.line}, type: {self.token_type}] {self.value}"
 
-    def check_input(self, input_file):
+    def check_input(self, input_file, text):
         if input_file:
             with open(input_file) as f:
                 input_file = f.read()
             return input_file
+        elif text:
+            return Stream([text])
         else:
             return stdin
 
-    def lexer(self, input_file = ""):
+    def lexer(self, text = "", input_file = ""):
         last_line_number = 1
-        id_number_free = re.compile("[a-zA-Z+-\/\*]+")
-        id_complex = re.compile("[a-zA-Z0-9_+-\/\*']+")
+        id_number_free = re.compile("[a-zA-Z+\-\/\*]+")
+        id_complex = re.compile("[a-zA-Z0-9_+\-\/\*']+")
         universal = re.compile("[,:>=\.\[\]]+")
-        input_file = self.check_input(input_file)
+        input_file = self.check_input(input_file, text)
         with input_file as content:
             for line, line_number in zip(content, itertools.count(1)):
                 value = ""
@@ -119,7 +132,7 @@ class Token:
                             yield Token(last_line_number,';',TokenType.separator)
                         elif line[0] == '\n':
                             line = line[1:]
-                            yield Token(last_line_number,'\n',TokenType.separator)
+                            yield Token(last_line_number,'\\n',TokenType.separator)
                         elif line[0] == ' ':
                             line = line[1:]
                         elif line[0] == '.':
@@ -233,11 +246,18 @@ class Token:
                             print(f"[Error][LA] found uknown character {line[0]} {state}")
                             exit(1)
                 if value != "":
-                    print("[Warning][LA] Some data has not been checked by LA:")
-                    print(value)
+                    if state == LexerState.Q_A1:
+                        yield Token(line_number, value, TokenType.identifier)
+                    elif state == LexerState.Q_B1:
+                        yield Token(line_number, float(value), TokenType.integer)
+                    else:
+                        print("[Warning][LA] Some data has not been checked by LA:")
+                        print(value)
         yield Token(last_line_number, "EOF", TokenType.end_of_file)
 
 if __name__ == "__main__":
     t = Token()
-    for i in t.lexer():
+    #for i in t.lexer():
+    #    print(i)
+    for i in t.lexer(text=input('yolo:')):
         print(i)

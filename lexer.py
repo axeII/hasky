@@ -67,10 +67,11 @@ class Token:
         return f"Token::<line: {self.line}, type: {self.token_type}, value: {self.token_value}>"
 
     def check_input(self, input_file, text):
+        print(input_file)
         if input_file:
             with open(input_file) as f:
-                input_file = f.read()
-            return input_file
+                read_data = f.readlines()
+            return Stream(read_data)
         elif text:
             return Stream([text])
         else:

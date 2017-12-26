@@ -23,7 +23,7 @@ class AST:
 class Variable(AST):
 
     def __init__(self, value):
-        super().__init__(value, "Number")
+        super().__init__(value, "Variable")
 
 class Number(AST):
 

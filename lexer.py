@@ -57,14 +57,14 @@ class Stream:
 
 class Token:
 
-    def __init__(self, line = 1, value = "", token_type = None):
+    def __init__(self, line = 1, token_value = "", token_type = None):
         self.line = line
-        self.value = value
+        self.token_value = token_value
         self.token_type = token_type
         #think about splitting input text for parts
 
     def __repr__(self):
-        return f"[line: {self.line}, type: {self.token_type}] {self.value}"
+        return f"Token::<line: {self.line}, type: {self.token_type}, value: {self.token_value}>"
 
     def check_input(self, input_file, text):
         if input_file:
@@ -78,7 +78,7 @@ class Token:
 
     def lexer(self, text = "", input_file = ""):
         last_line_number = 1
-        id_number_free = re.compile("[a-zA-Z+\-\/\*]+")
+        id_number_free = re.compile("[a-zA-Z+\-\/\*_]+")
         id_complex = re.compile("[a-zA-Z0-9_+\-\/\*']+")
         universal = re.compile("[,:>=\.\[\]]+")
         input_file = self.check_input(input_file, text)
@@ -254,6 +254,13 @@ class Token:
                         print("[Warning][LA] Some data has not been checked by LA:")
                         print(value)
         yield Token(last_line_number, "EOF", TokenType.end_of_file)
+
+
+def untoken(test_token):
+    if isinstance(test_token, Token):
+        return test_token.token_value
+    else:
+        return test_token
 
 if __name__ == "__main__":
     t = Token()

@@ -51,7 +51,7 @@ class Interpret:
                 ast = parser.root_ast
                 self.interpret(ast)
         else:
-            self.parser = Parser(self.token.lexer(inp_file))
+            self.parser = Parser(self.token.lexer(input_file=inp_file))
 
     def init_context(self):
         self.context = default_functions = {

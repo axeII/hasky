@@ -7,9 +7,9 @@ __author__ = 'ales lerch'
 
 #import uuid
 import types
-from ast import Function
 from parser import Parser
 from lexer import Token, untoken
+from ast import Function, ast_value
 
 class ContextValue:
 
@@ -70,22 +70,22 @@ class Interpret:
             ),
             "+": ContextValue(
                 "default", Function(
-                    "+", None, lambda x, y: untoken(x) + untoken(y)
+                    "+", None, lambda x, y: untoken(ast_value(x)) + untoken(ast_value(y))
                 )
             ),
             "-": ContextValue(
                 "default", Function(
-                    "-", None, lambda x, y: untoken(x) - untoken(y)
+                    "-", None, lambda x, y: untoken(ast_value(x)) - untoken(ast_value(y))
                 )
             ),
             "/": ContextValue(
                 "default", Function(
-                    "/", None, lambda x, y: untoken(x) / untoken(y)
+                    "/", None, lambda x, y: untoken(ast_value(x)) / untoken(ast_value(y))
                 )
             ),
             "*": ContextValue(
                 "default", Function(
-                    "*", None, lambda x, y: untoken(x) * untoken(y)
+                    "*", None, lambda x, y: untoken(ast_value(x)) * untoken(ast_value(y))
                 )
             ),
             "stack": ContextValue(

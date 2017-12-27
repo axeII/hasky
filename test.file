@@ -1,2 +1,4 @@
-true = fn a b: a;; true 1 2;
-anon = fn a: a;;
+true = fn a b: a;
+true 3 2
+anon = fn a: a;
+anon 1;

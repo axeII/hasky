@@ -6,9 +6,10 @@ Syntactic analyzator for discovering grammar
 __author__ = 'ales lerch'
 
 #import uuid
-from ast import *
-from lexer import *
+import types
+from ast import Function
 from parser import Parser
+from lexer import Token, untoken
 
 class ContextValue:
 
@@ -24,6 +25,13 @@ class ContextValue:
     def eval_cvalue(self):
         return self.cont_val_data._eval()
 
+    @classmethod
+    def unzip(data):
+        if isinstance(data, ContextValue):
+            return data.cont_val_data
+        else:
+            return data
+
 class FunctionNotFound(Exception):
 
     def __init__(self, message):
@@ -31,58 +39,58 @@ class FunctionNotFound(Exception):
 
 class Interpret:
 
-    def __init__(self, inp_file, on_interpreter = False):
+    def __init__(self, inp_file, on_interpreter=False):
         self.token = Token()
         self.parser = None
         #self.context = {}
         self.init_context()
         if on_interpreter:
-            while True:
-                try:
-                    text_ = input('flang> ')
-                except EOFError:
-                    break
-                if not text_:
-                    continue
-
-                lexer = self.token.lexer(text=text_)
-                parser = Parser(lexer)
-                return_value = parser.program()
-                ast = parser.root_ast
-                self.interpret(ast)
+            self.start_interpreter()
         else:
             self.parser = Parser(self.token.lexer(input_file=inp_file))
 
+    def start_interpreter(self):
+        while True:
+            try:
+                text_ = input('flang> ')
+            except EOFError:
+                break
+            if not text_:
+                continue
+            parser = Parser(self.token.lexer(text=text_))
+            parser.program()
+            self.interpret(parser.root_ast)
+
     def init_context(self):
         self.context = default_functions = {
-        "eval": ContextValue(
-            "default", Function(
-                "eval", None, lambda x: self.context[x.value.token_value].eval_cvalue()
+            "eval": ContextValue(
+                "default", Function(
+                    "eval", None, lambda x: self.context[x.value.token_value].eval_cvalue()
                 )
             ),
-        "+": ContextValue(
-            "default", Function(
-                "+", None, lambda x, y: untoken(x) + untoken(y)
+            "+": ContextValue(
+                "default", Function(
+                    "+", None, lambda x, y: untoken(x) + untoken(y)
                 )
             ),
-        "-": ContextValue(
-            "default", Function(
-                "-", None, lambda x, y:  untoken(x) - untoken(y)
+            "-": ContextValue(
+                "default", Function(
+                    "-", None, lambda x, y: untoken(x) - untoken(y)
                 )
             ),
-        "/": ContextValue(
-            "default", Function(
-                "/", None, lambda x, y: untoken(x) / untoken(y)
+            "/": ContextValue(
+                "default", Function(
+                    "/", None, lambda x, y: untoken(x) / untoken(y)
                 )
             ),
-        "*": ContextValue(
-            "default", Function(
-                "*", None, lambda x, y: untoken(x) * untoken(y)
+            "*": ContextValue(
+                "default", Function(
+                    "*", None, lambda x, y: untoken(x) * untoken(y)
                 )
             ),
-        "stack": ContextValue(
-            "default", Function(
-                "stack", None, lambda _: self.print_context_data()
+            "stack": ContextValue(
+                "default", Function(
+                    "stack", None, lambda _: self.print_context_data()
                 )
             ),
         }
@@ -91,32 +99,38 @@ class Interpret:
         for key, val in self.context.items():
             print(f" {key}: {val.cont_val_data.value}")
 
-    def interpret(self,data = None, ast = []):
+    def interpret(self, data=None, ast=[]):
 
         def search_function(name_of_function):
-            for searching_fn in list(filter(lambda x: x.cont_val_type != "CallingFunction",self.context.values())):
+            for searching_fn in list(filter(lambda x: x.cont_val_type != "CallingFunction", self.context.values())):
                 if searching_fn.cont_val_data.name == "Function" and\
                    untoken(searching_fn.cont_val_data.keyword) == name_of_function.token_value:
                     return searching_fn
 
             raise FunctionNotFound(f"Function {untoken(name_of_function)} not found")
 
-        def control_eval(fnd_func, set_args = {}):
+        def check_context(local_cont, glob_cont, ch_val):
+            try:
+                return local_cont[ch_val]
+            except KeyError:
+                if ch_val in glob_cont:
+                    return glob_cont[ch_val].cont_val_data.value
+                else:
+                    print(f"{ch_val} not found")
+
+        def control_eval(fnd_func, context, set_args={}):
             for arg_number in range(len(fnd_func.cont_val_data.args)):
                 set_args[untoken(fnd_func.cont_val_data.args[arg_number])] =\
                     untoken(operation.value[arg_number].value)
-            func_ = self.context[
-                        untoken(fnd_func.cont_val_data.value[0].value)
-                    ].cont_val_data.value
-            args_ = list(
-                        map(
-                            lambda f: set_args[untoken(f.value)] if untoken(f.value) in\
-                                set_args else untoken(f.value),
-                            fnd_func.cont_val_data.value[1:]
-                            )
-                    )
-            #print(func_,args_)
-            print(func_(*args_))
+
+            func_ = check_context(
+                set_args, context, untoken(fnd_func.cont_val_data.value[0].value))
+            args_ = list(map(lambda f: set_args[untoken(f.value)] if untoken(f.value) in\
+                set_args else untoken(f.value), fnd_func.cont_val_data.value[1:]))
+            if isinstance(func_, types.LambdaType):
+                print(func_(*args_))
+            else:
+                print(func_)
 
         if not data and self.parser:
             print(self.parser.program())
@@ -137,7 +151,7 @@ class Interpret:
                     return 1
                 if found_fn.cont_val_type != "default":
                     """ if found function is defautl"""
-                    control_eval(found_fn)
+                    control_eval(found_fn, self.context)
                 else:
                     """ if found function is not defautl e.g. user made it"""
                     #print(operation, *operation.value)

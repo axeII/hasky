@@ -18,4 +18,5 @@ before_script:
 
 script:
  - pylint main.py
- - python3 main.py test.file
+ - python3 main.py tests/test01.in
+ - python3 main.py tests/test02.in

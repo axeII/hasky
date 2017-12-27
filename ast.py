@@ -66,3 +66,9 @@ class CallingFunction(AST):
         super().__init__(args, "CallingFunction")
         self.keyword = keyword
 
+def ast_value(data):
+    if isinstance(data, AST):
+        return data.value
+    else:
+        return data
+

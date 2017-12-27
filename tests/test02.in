@@ -1,0 +1,4 @@
++ 1 2
+- 2 1
+plus = fn a b: + a b;
+plus 1 4;

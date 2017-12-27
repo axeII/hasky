@@ -19,10 +19,10 @@ Iden' -> EPSILON | id Iden'
 Body -> { BL in Expr }
 """
 __author__ = 'ales lerch'
-import pdb
-from lexer import *
-from ast import *
+
 from sys import exit, stderr, stdin, stdout
+from lexer import Token, TokenType
+from ast import Function, CallingFunction, Number, String, Assigment, Variable, Real
 
 class Parser:
 
@@ -49,7 +49,8 @@ class Parser:
         # is atomic
         return self.token.token_type in (TokenType.string, TokenType.real, TokenType.integer)
 
-    def is_identifier(self, val = ""):
+
+    def is_identifier(self, val=""):
         is_id = self.token.token_type == TokenType.identifier
         has_value = self.token.token_value == val
         return is_id and has_value if val else is_id
@@ -157,9 +158,14 @@ class Parser:
             self.next_token()
             return Variable(val)
         elif self.atomic_blonde():
-            val = self.token
+            if self.token.token_type == TokenType.string:
+                val = String(self.token)
+            elif self.token.token_type == TokenType.integer:
+                val = Number(self.token)
+            else:
+                val = Real(self.token)
             self.next_token()
-            return Number(val)
+            return val
         elif self.token.token_type == TokenType.left_paren:
             self.next_token()
             self.expression()

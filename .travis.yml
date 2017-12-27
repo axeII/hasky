@@ -1,7 +1,22 @@
 language: python
-python:
-  - "3.6"
-# command to install dependencies
-install: true
-# command to run tests
-script: python main.py
+
+matrix:
+  include:
+    - os: linux
+      language: python
+      python: "3.6.1"
+
+    - os: linux
+      language: python
+      python: "3.6.2"
+
+install:
+ - pip install pylint
+
+before_script:
+ - pylint --version
+
+script:
+ - pylint main.py
+ - python3 main.py tests/test01.in
+ - python3 main.py tests/test02.in

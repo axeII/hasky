@@ -256,13 +256,6 @@ class Token:
                         print(value)
         yield Token(last_line_number, "EOF", TokenType.end_of_file)
 
-
-def untoken(test_token):
-    if isinstance(test_token, Token):
-        return test_token.token_value
-    else:
-        return test_token
-
 if __name__ == "__main__":
     t = Token()
     for i in t.lexer():

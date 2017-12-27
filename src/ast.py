@@ -13,12 +13,6 @@ class AST:
         self.name = name
         self.value = value
 
-    def __eq__(self, other):
-        return self.value == other.value
-
-    def __hash__(self):
-        return hash(self.value)
-
     def _eval(self):
         if self.value.token_type == TokenType.string:
             return f'"{self.value.token_value}"'
@@ -26,7 +20,6 @@ class AST:
             return int(self.value.token_value)
         else:
             return self.value.token_value
-
 
 class Variable(AST):
 
@@ -65,10 +58,3 @@ class CallingFunction(AST):
     def __init__(self, keyword, args):
         super().__init__(args, "CallingFunction")
         self.keyword = keyword
-
-def ast_value(data):
-    if isinstance(data, AST):
-        return data.value
-    else:
-        return data
-

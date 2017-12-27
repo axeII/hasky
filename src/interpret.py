@@ -8,34 +8,9 @@ __author__ = 'ales lerch'
 #import uuid
 import types
 from parser import Parser
-from lexer import Token, untoken
-from ast import Function, ast_value
-
-class ContextValue:
-
-    __slots__ = ("cont_val_type", "cont_val_data")
-
-    def __init__(self, type_, data):
-        self.cont_val_type = type_
-        if isinstance(data, list):
-            self.cont_val_data = data[0]
-        else:
-            self.cont_val_data = data
-
-    def eval_cvalue(self):
-        return self.cont_val_data._eval()
-
-    @classmethod
-    def unzip(data):
-        if isinstance(data, ContextValue):
-            return data.cont_val_data
-        else:
-            return data
-
-class FunctionNotFound(Exception):
-
-    def __init__(self, message):
-        super().__init__(message)
+from lexer import Token
+from ast import Function
+from util import FunctionNotFound, ContextValue, untoken, ast_value
 
 class Interpret:
 

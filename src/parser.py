@@ -28,6 +28,7 @@ class Parser:
 
     def __init__(self, lexer):
         self.token = None
+        self.ignore = False
         self.root_ast = []
         self.lexer = lexer
         self.next_token()
@@ -45,8 +46,7 @@ class Parser:
         exit(2)
 
     def atomic_blonde(self):
-        # add boolean?
-        # is atomic
+        """checks if current token - self.token is atom -> is in string, real or integer type"""
         return self.token.token_type in (TokenType.string, TokenType.real, TokenType.integer)
 
 
@@ -55,13 +55,12 @@ class Parser:
         has_value = self.token.token_value == val
         return is_id and has_value if val else is_id
 
-    #Program -> BL
     def program(self):
         #print("Program")
         if self.is_identifier():
             self.binding_list()
         elif self.token.token_type == TokenType.end_of_file:
-            print("Functional proraming without anything come on!!")
+            print("[Error] No input was probably set.")
             return 1
         elif self.token.token_value == '\\n':
             pass
@@ -69,7 +68,6 @@ class Parser:
             self.error("identifier")
         return 0
 
-    #BL → SB BL'
     def binding_list(self):
         #print("binding_list")
         if self.is_identifier():
@@ -78,7 +76,6 @@ class Parser:
         else:
             self.error("identifier")
 
-    #BL' -> epsilon | ; BL | '\n' BL
     def binding_list_(self):
         #print("binding_list_")
         if self.token.token_type == TokenType.end_of_file:
@@ -134,7 +131,9 @@ class Parser:
     def expression_(self):
         #print("expression_")
         if self.token.token_type == TokenType.separator:
-            self.next_token()
+            if not self.ignore:
+                self.next_token()
+            self.ignore = False
             return list()
         elif self.is_identifier()\
                 or self.is_identifier("fn")\
@@ -229,6 +228,7 @@ class Parser:
         #print("x")
         if self.token.token_type == TokenType.arg_sep:
             self.next_token()
+            self.ignore = True
             return self.expression()
         elif self.token.token_type == TokenType.left_braces:
             self.body()

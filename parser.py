@@ -41,7 +41,7 @@ class Parser:
             return False
 
     def error(self, exp):
-        print(f"On line: {self.token.line} expected identificator but {self.token.token_value} found")
+        print(f"On line: {self.token.line} expected identifier but {self.token.token_value} found")
         exit(2)
 
     def atomic_blonde(self):
@@ -49,7 +49,8 @@ class Parser:
         # is atomic
         return self.token.token_type in (TokenType.string, TokenType.real, TokenType.integer)
 
-    def is_identificatior(self, val=""):
+
+    def is_identifier(self, val=""):
         is_id = self.token.token_type == TokenType.identifier
         has_value = self.token.token_value == val
         return is_id and has_value if val else is_id
@@ -57,7 +58,7 @@ class Parser:
     #Program -> BL
     def program(self):
         #print("Program")
-        if self.is_identificatior():
+        if self.is_identifier():
             self.binding_list()
         elif self.token.token_type == TokenType.end_of_file:
             print("Functional proraming without anything come on!!")
@@ -65,42 +66,42 @@ class Parser:
         elif self.token.token_value == '\\n':
             pass
         else:
-            self.error("identificator")
+            self.error("identifier")
         return 0
 
     #BL → SB BL'
     def binding_list(self):
         #print("binding_list")
-        if self.is_identificatior():
+        if self.is_identifier():
             self.single_binding()
             self.binding_list_()
         else:
-            self.error("identificator")
+            self.error("identifier")
 
     #BL' -> epsilon | ; BL | '\n' BL
     def binding_list_(self):
         #print("binding_list_")
         if self.token.token_type == TokenType.end_of_file:
             self.token = None
-        elif self.is_identificatior("in"):
+        elif self.is_identifier("in"):
             self.next_token()
-        elif self.is_identificatior():
+        elif self.is_identifier():
             self.binding_list()
         elif self.token.token_value == '\\n':
             #for debugging
             self.token = None
         else:
-            self.error("identificator, newline, fn, eof")
+            self.error("identifier, newline, fn, eof")
 
     def single_binding(self):
         #print("single_binding")
-        if self.is_identificatior():
+        if self.is_identifier():
             self.id = self.token
             self.next_token()
             self.single_binding_()
         else:
-            self.error(f"Expected identificator but {self.token} found")
-            self.error("identificator")
+            self.error(f"Expected identifier but {self.token} found")
+            self.error("identifier")
 
     def single_binding_(self):
         #print("single_binding_")
@@ -108,19 +109,19 @@ class Parser:
             self.next_token()
             #self.expression()
             self.root_ast.append(Assigment(self.id, self.expression()))
-        elif self.is_identificatior()\
-                or self.is_identificatior("fn")\
+        elif self.is_identifier()\
+                or self.is_identifier("fn")\
                 or self.atomic_blonde()\
                 or self.token.token_type == TokenType.left_paren\
                 or self.token.token_type == TokenType.left_closed_braces:
             self.root_ast.append(CallingFunction(self.id, self.expression()))
         else:
-            self.error("identificator, atom, (, =")
+            self.error("identifier, atom, (, =")
 
     def expression(self):
         #print("expression")
-        if self.is_identificatior()\
-                or self.is_identificatior("fn")\
+        if self.is_identifier()\
+                or self.is_identifier("fn")\
                 or self.atomic_blonde()\
                 or self.token.token_type == TokenType.left_paren\
                 or self.token.token_type == TokenType.left_closed_braces:
@@ -135,8 +136,8 @@ class Parser:
         if self.token.token_type == TokenType.separator:
             self.next_token()
             return list()
-        elif self.is_identificatior()\
-                or self.is_identificatior("fn")\
+        elif self.is_identifier()\
+                or self.is_identifier("fn")\
                 or self.atomic_blonde()\
                 or self.token.token_type == TokenType.left_paren\
                 or self.token.token_type == TokenType.left_closed_braces:
@@ -146,13 +147,13 @@ class Parser:
             self.expression()
             #should return something?
         else:
-            self.error("identificator, >")
+            self.error("identifier, >")
 
     def value(self):
         #print("value")
-        if self.is_identificatior("fn"):
+        if self.is_identifier("fn"):
             return self._lambda()
-        elif self.is_identificatior():
+        elif self.is_identifier():
             val = self.token
             self.next_token()
             return Variable(val)
@@ -184,7 +185,7 @@ class Parser:
 
     def _lambda(self):
         #print("_lambda")
-        if self.is_identificatior("fn"):
+        if self.is_identifier("fn"):
             self.next_token()
             return self._lambda_()
         else:
@@ -192,21 +193,21 @@ class Parser:
 
     def _lambda_(self):
         #print("_lambda_")
-        if self.is_identificatior():
+        if self.is_identifier():
             #print(self.idens())
             #print(self.x())
             return Function(self.id, self.idens(), self.x())
         else:
-            self.error("identificator")
+            self.error("identifier")
 
     def idens(self):
         #print("idens")
-        if self.is_identificatior():
+        if self.is_identifier():
             args = [self.token]
             self.next_token()
             return args + self.idens_()
         else:
-            self.error("identificator")
+            self.error("identifier")
 
     def idens_(self):
         #print("idens_")
@@ -214,7 +215,7 @@ class Parser:
                 or self.token.token_type == TokenType.arg_sep:
             return list()
             #self.token = None
-        elif self.is_identificatior():
+        elif self.is_identifier():
             args = [self.token]
             self.next_token()
             try:
@@ -222,7 +223,7 @@ class Parser:
             except TypeError:
                 return args
         else:
-            self.error("identificator")
+            self.error("identifier")
 
     def x(self):
         #print("x")
@@ -232,14 +233,14 @@ class Parser:
         elif self.token.token_type == TokenType.left_braces:
             self.body()
         else:
-            self.error("identificator")
+            self.error("identifier")
 
     def body(self):
         #print("body")
         if self.token.token_type == TokenType.left_braces:
             self.next_token()
             self.binding_list()
-            if self.is_identificatior("in"):
+            if self.is_identifier("in"):
                 self.next_token()
                 self.expression()
             else:

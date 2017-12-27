@@ -67,7 +67,6 @@ class Token:
         return f"Token::<line: {self.line}, type: {self.token_type}, value: {self.token_value}>"
 
     def check_input(self, input_file, text):
-        print(input_file)
         if input_file:
             with open(input_file) as f:
                 read_data = f.readlines()
@@ -202,7 +201,7 @@ class Token:
                             print(f"[Error][LA] found uknown character {line[0]} {state}")
                             exit(1)
 
-                    elif state == Q_B2F:
+                    elif state == LexerState.Q_B2F:
                         if line[0].isdigit():
                             value += line[0]
                             line = line[1:]
@@ -230,11 +229,12 @@ class Token:
                             line = line[1:]
                             status = LexerState.Q_D2
                         elif line[0] == '"':
-                            yield Token(last_line_number,value,TokenType.string)
+                            yield Token(last_line_number, str(value), TokenType.string)
                             value = ""
+                            line = line[1:]
                             state = LexerState.Q_S
                         else:
-                            print(f"[Error][LA] found uknown character {line[0]} {state}")
+                            print(f"[Error][LA] found uknown character line:'{line[0]}' state:{state}")
                             exit(1)
 
                     elif state == LexerState.Q_D2:
@@ -265,7 +265,5 @@ def untoken(test_token):
 
 if __name__ == "__main__":
     t = Token()
-    #for i in t.lexer():
-    #    print(i)
-    for i in t.lexer(text=input('yolo:')):
+    for i in t.lexer():
         print(i)

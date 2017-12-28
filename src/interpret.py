@@ -68,6 +68,11 @@ class Interpret:
                     "stack", None, lambda _: self.print_context_data()
                 )
             ),
+            "type": ContextValue(
+                "default", Function(
+                    "type", None, lambda a: self.context[untoken(ast_value(a))].cont_val_data.name
+                )
+            ),
         }
 
     def print_context_data(self):
@@ -85,8 +90,15 @@ class Interpret:
             raise FunctionNotFound(f"Function {untoken(name_of_function)} not found")
 
         def check_context(local_cont, glob_cont, ch_val):
+            #print(ch_val)
             try:
-                return local_cont[ch_val]
+                found = local_cont[ch_val]
+                if found in glob_cont:
+                    #print('oh',control_eval(glob_cont[found], glob_cont, local_cont))
+                    #print('kek:',glob_cont[found].cont_val_data.value)
+                    return glob_cont[found].cont_val_data.value
+                #print(found)
+                return found
             except KeyError:
                 if ch_val in glob_cont:
                     return glob_cont[ch_val].cont_val_data.value
@@ -94,18 +106,29 @@ class Interpret:
                     print(f"{ch_val} not found")
 
         def control_eval(fnd_func, context, set_args={}):
+
+            def ctrlvar_scp(local_scope, global_scope, variable):
+                """fucntion that controlos value for first local scope
+                and then for global scope"""
+                if untoken(variable.value) in local_scope:
+                    return local_scope[untoken(variable.value)]
+                elif untoken(variable.value) in global_scope:
+                    return untoken(ast_value(global_scope[untoken(variable.value)].cont_val_data))
+                else:
+                    return untoken(variable.value)
+
             for arg_number in range(len(fnd_func.cont_val_data.args)):
                 set_args[untoken(fnd_func.cont_val_data.args[arg_number])] =\
                     untoken(operation.value[arg_number].value)
 
-            func_ = check_context(
-                set_args, context, untoken(fnd_func.cont_val_data.value[0].value))
-            args_ = list(map(lambda f: set_args[untoken(f.value)] if untoken(f.value) in\
-                set_args else untoken(f.value), fnd_func.cont_val_data.value[1:]))
+            func_ = check_context(set_args, context, untoken(fnd_func.cont_val_data.value[0].value))
+            args_ = list(map(lambda a: ctrlvar_scp(set_args, context, a), fnd_func.cont_val_data.value[1:]))
+            print(func_)
             if isinstance(func_, types.LambdaType):
-                print(func_(*args_))
+#c = fn f x: f x; pluspet = fn x: + x 5; c pluspet 6;
+                return func_(*args_)
             else:
-                print(func_)
+                return func_
 
         if not data and self.parser:
             print(self.parser.program())
@@ -126,7 +149,7 @@ class Interpret:
                     return 1
                 if found_fn.cont_val_type != "default":
                     """ if found function is defautl"""
-                    control_eval(found_fn, self.context)
+                    print(control_eval(found_fn, self.context))
                 else:
                     """ if found function is not defautl e.g. user made it"""
                     #print(operation, *operation.value)

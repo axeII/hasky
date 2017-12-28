@@ -36,13 +36,13 @@ class Parser:
     def next_token(self):
         try:
             self.token = next(self.lexer)
-            #print(self.token.token_type, self.token.value)#DEBUGGING
+            #print(self.token.token_type, self.token.token_value)#DEBUGGING
             return True
         except (StopIteration, AttributeError):
             return False
 
     def error(self, exp):
-        print(f"On line: {self.token.line} expected identifier but {self.token.token_value} found")
+        print(f"On line: {self.token.line} expected {exp} but {self.token.token_value} found")
         exit(2)
 
     def atomic_blonde(self):
@@ -97,7 +97,6 @@ class Parser:
             self.next_token()
             self.single_binding_()
         else:
-            self.error(f"Expected identifier but {self.token} found")
             self.error("identifier")
 
     def single_binding_(self):
@@ -168,7 +167,7 @@ class Parser:
         elif self.token.token_type == TokenType.left_paren:
             self.next_token()
             self.expression()
-            if self.token == TokenType.right_paren:
+            if self.token.token_type == TokenType.right_paren:
                 self.next_token()
             else:
                 self.error(")")

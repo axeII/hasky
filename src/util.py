@@ -26,6 +26,11 @@ class FunctionNotFound(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+class DiffenrentTypes(Exception):
+
+    def __init__(self, message):
+        super().__init__(message)
+
 def untoken(test_token):
     if isinstance(test_token, Token):
         return test_token.token_value

@@ -5,6 +5,9 @@ clean-pyc:
 	find . -name '*.pyo' -exec rm --force {} +
 	name '*~' -exec rm --force  {}
 
+clean-tex:
+	rm *.tex
+
 test:
-	python3 src/main.py sample/test01.in
-	python3 src/main.py sample/test02.in
+	python3 src/main.py sample/test01.hy
+	python3 src/main.py sample/test02.hy

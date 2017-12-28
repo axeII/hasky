@@ -41,6 +41,11 @@ class String(AST):
     def __init__(self, value):
         super().__init__(value, "String")
 
+class List(AST):
+
+    def __init__(self, data):
+        super().__init__(data, "List")
+
 class Assigment(AST):
 
     def __init__(self, keyword, value):

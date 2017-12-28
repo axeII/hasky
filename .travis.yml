@@ -17,5 +17,5 @@ before_script:
  - pylint --version
 
 script:
- - pylint main.py
-   make test
+ - pylint src/main.py
+ - make test

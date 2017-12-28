@@ -10,6 +10,15 @@ class Latex:
 
     def __init__(self, data):
         self.data = data
+        self.tempalte = """
+\\documentclass{article}
+\\usepackage[utf8]{inputenc}
+\\begin{document}
+%s
+\\end{document}
+"""
 
     def outprint(self):
-        print(self.data)
+        with open("default.tex", 'w') as lat:
+            lat.write(self.tempalte % self.data)
+        return self.data

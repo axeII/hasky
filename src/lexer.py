@@ -133,7 +133,7 @@ class Token:
                         elif line[0] == '\n':
                             line = line[1:]
                             yield Token(last_line_number,'\\n',TokenType.separator)
-                        elif line[0] == ' ':
+                        elif line[0] == ' ' or line[0] == '\t':
                             line = line[1:]
                         elif line[0] == '.':
                             line = line[1:]
@@ -213,9 +213,9 @@ class Token:
                     elif state == LexerState.Q_C1:
                         if line[0] in ('\t',' ') or universal.match(line[0]) or\
                                 id_complex.match(line[0]):
-                            value += line[0]#do i need to save commentary content?
                             line = line[1:]
                         elif line[0] == '\n':
+                            line = line[1:]
                             value = ""
                             state = LexerState.Q_S
                         else:

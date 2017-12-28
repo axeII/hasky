@@ -9,7 +9,7 @@ __author__ = 'ales lerch'
 import types
 from parser import Parser
 from lexer import Token
-from ast import Function
+from ast import Function, List
 from latex import Latex
 from util import FunctionNotFound, ContextValue, untoken, ast_value, DiffenrentTypes
 
@@ -181,11 +181,18 @@ class Interpret:
                     print(fnf)
                     return 1
                 if found_fn.cont_val_type != "default":
-                    """ if found function is default"""
+                    """ if found function is not default user made it"""
                     print(control_eval(found_fn, self.context))
                 else:
-                    """ if found function is not default e.g. user made it"""
-                    print(found_fn.cont_val_data.value(*operation.value))
+                    """ fucntion is defautl"""
+                    if isinstance(operation.value[0], List):
+                        """refactoring need fix dry"""
+                        data = list(map(lambda x: untoken(x.value), operation.value[0].value))
+                        lambda_ = eval(f"lambda _: {data[1]} {data[0]} {data[2]}")
+                        return found_fn.cont_val_data.value(lambda_(None))
+                    else:
+                        #print(found_fn.cont_val_data.value(*operation.value[0]))
+                        print(found_fn.cont_val_data.value(*operation.value))
             else:
                 self.context[key] = ContextValue(operation.name, operation.value)
                 print(f"{operation.keyword.token_value} = {operation.value[0].name}")

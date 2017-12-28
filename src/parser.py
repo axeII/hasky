@@ -22,7 +22,7 @@ __author__ = 'ales lerch'
 
 from sys import exit, stderr, stdin, stdout
 from lexer import Token, TokenType
-from ast import Function, CallingFunction, Number, String, Assigment, Variable, Real
+from ast import Function, CallingFunction, Number, String, Assigment, Variable, Real, List
 
 class Parser:
 
@@ -166,9 +166,10 @@ class Parser:
             return val
         elif self.token.token_type == TokenType.left_paren:
             self.next_token()
-            self.expression()
+            val = self.expression()
             if self.token.token_type == TokenType.right_paren:
                 self.next_token()
+                return List(val)
             else:
                 self.error(")")
         elif self.token.token_type == TokenType.left_closed_braces:

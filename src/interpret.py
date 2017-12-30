@@ -192,7 +192,10 @@ class Interpret:
                         return found_fn.cont_val_data.value(lambda_(None))
                     else:
                         #print(found_fn.cont_val_data.value(*operation.value[0]))
-                        print(found_fn.cont_val_data.value(*operation.value))
+                        try:
+                            print(found_fn.cont_val_data.value(*operation.value))
+                        except KeyError as e:
+                            print(f"Variable {e.args[0]} doesn't exit")
             else:
                 self.context[key] = ContextValue(operation.name, operation.value)
                 print(f"{operation.keyword.token_value} = {operation.value[0].name}")

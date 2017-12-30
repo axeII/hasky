@@ -17,6 +17,16 @@ X -> : Expr | Body
 Iden -> id Iden'
 Iden' -> EPSILON | id Iden'
 Body -> { BL in Expr }
+
+version 2:
+Program -> BL
+BL -> SB BL'
+BL' -> EPSILON | BL s
+SB -> id  = Val
+Val -> id | atom | Lambda | ( Expren ) | Declare
+Expren -> Val Expren | EPSILON
+Lambda -> fn Iden : Val
+Expren -> Val Expren | EPSILON
 """
 __author__ = 'ales lerch'
 

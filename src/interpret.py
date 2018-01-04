@@ -76,7 +76,7 @@ class Interpret:
             ),
             "latex": ContextValue(
                 "default", Function(
-                    "latex", None, lambda a: Latex(a).outprint()
+                    "latex", None, lambda a: Latex(untoken(ast_value(a))).outprint()
                 )
             ),
         }

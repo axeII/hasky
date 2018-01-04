@@ -6,7 +6,7 @@ clean-pyc:
 	name '*~' -exec rm --force  {}
 
 clean-tex:
-	rm *.tex
+	rm -f *.tex
 
 test:
 	python3 src/main.py sample/test01.hy

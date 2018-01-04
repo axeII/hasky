@@ -26,9 +26,17 @@ class Interpret:
             self.parser = Parser(self.token.lexer(input_file=inp_file))
 
     def start_interpreter(self):
+        print("""
+.__                   __           
+|  |__ _____    _____|  | _____.__.
+|  |  \\__   \\  /  ___/  |/ <   |  | | hasky alpha v. 0.0.4
+|   Y  \/ __ \_\___ \|    < \___  | | demo version
+|___|  (____  /____  >__|_ \/ ____| | 
+     \/     \/     \/     \/\/     
+""")
         while True:
             try:
-                text_ = input('flang> ')
+                text_ = input('hasky> ')
             except EOFError:
                 break
             if not text_:

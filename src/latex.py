@@ -3,11 +3,10 @@
 Syntactic analyzator for discovering grammar
 
 """
-__author__ = 'ales lerch'
+__author__ = "ales lerch"
 
 
 class Latex:
-
     def __init__(self, data):
         self.data = data
         self.tempalte = """
@@ -19,6 +18,6 @@ class Latex:
 """
 
     def outprint(self):
-        with open("default.tex", 'w') as lat:
+        with open("default.tex", "w") as lat:
             lat.write(self.tempalte % self.data)
         return self.data

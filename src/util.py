@@ -2,10 +2,12 @@
 
 utils separated into module util, used for project
 """
-__author__ = 'ales lerch'
+__author__ = "ales lerch"
 
 from ast import AST
+
 from lexer import Token
+
 
 class ContextValue:
 
@@ -21,15 +23,16 @@ class ContextValue:
     def eval_cvalue(self):
         return self.cont_val_data._eval()
 
-class FunctionNotFound(Exception):
 
+class FunctionNotFound(Exception):
     def __init__(self, message):
         super().__init__(message)
+
 
 class DiffenrentTypes(Exception):
-
     def __init__(self, message):
         super().__init__(message)
+
 
 def untoken(test_token):
     if isinstance(test_token, Token):
@@ -37,9 +40,9 @@ def untoken(test_token):
     else:
         return test_token
 
+
 def ast_value(data):
     if isinstance(data, AST):
         return data.value
     else:
         return data
-

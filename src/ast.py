@@ -5,7 +5,7 @@ AST tree for data sctructure of grammar data
 
 __author__ = "ales lerch"
 
-from lexer import TokenType
+from src.lexer import TokenType
 
 
 class AST:

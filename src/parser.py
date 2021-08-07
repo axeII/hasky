@@ -30,11 +30,11 @@ Expren -> Val Expren | EPSILON
 """
 __author__ = "ales lerch"
 
-from ast import (Assigment, CallingFunction, Function, List, Number, Real,
-                 String, Variable)
 from sys import exit, stderr, stdin, stdout
 
-from lexer import Token, TokenType
+from src.ast import (Assigment, CallingFunction, Function, List, Number, Real,
+                     String, Variable)
+from src.lexer import Token, TokenType
 
 
 class Parser:

@@ -6,7 +6,7 @@ __author__ = "ales lerch"
 
 from ast import AST
 
-from lexer import Token
+from src.lexer import Token
 
 
 class ContextValue:

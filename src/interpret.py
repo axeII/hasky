@@ -6,12 +6,12 @@ Syntactic analyzator for discovering grammar
 __author__ = "ales lerch"
 
 import types
-from ast import Function, List
-from parser import Parser
+from src.ast import Function, List
+from src.parser import Parser
 
-from latex import Latex
-from lexer import Token
-from util import (ContextValue, DiffenrentTypes, FunctionNotFound, ast_value,
+from src.latex import Latex
+from src.lexer import Token
+from src.util import (ContextValue, DiffenrentTypes, FunctionNotFound, ast_value,
                   untoken)
 
 HASKY = """
@@ -24,16 +24,23 @@ HASKY = """
 """
 
 class Interpret:
-    def __init__(self, inp_file, on_interpreter=False):
+    def __init__(self, input_file):
+        """[Interpreter for hasky lang]
+
+        Args:
+            input_file ([string none]): [Input]
+            on_interpreter (bool, optional): [description]. Defaults to False.
+        """
         self.token = Token()
         self.parser = None
         # self.context = {}
+
         self.init_context()
-        if on_interpreter:
+        if not input_file:
             print(HASKY)
             self.start_interpreter()
         else:
-            self.parser = Parser(self.token.lexer(input_file=inp_file))
+            self.parser = Parser(self.token.lexer(input_file=input_file))
 
     def start_interpreter(self):
         while True:
